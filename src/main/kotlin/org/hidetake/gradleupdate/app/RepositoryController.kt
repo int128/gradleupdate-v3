@@ -23,7 +23,7 @@ class RepositoryController(val service: GradleUpdateService) {
     @GetMapping("status")
     fun html(@PathVariable owner: String, @PathVariable repo: String) =
         ModelAndView("status", mapOf(
-            "repository" to service.getRepository(RepositoryPath(owner, repo)),
+            "repository" to service.getRepositoryMetadata(RepositoryPath(owner, repo)),
             "pullRequest" to service.findPullRequestForUpdate(RepositoryPath(owner, repo))
         ))
 

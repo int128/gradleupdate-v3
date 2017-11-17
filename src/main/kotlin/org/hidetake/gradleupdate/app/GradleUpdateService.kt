@@ -11,7 +11,7 @@ class GradleUpdateService(
 ) {
     private val LATEST_GRADLE_WRAPPER = RepositoryPath("int128", "latest-gradle-wrapper")
 
-    fun getRepository(repositoryPath: RepositoryPath) =
+    fun getRepositoryMetadata(repositoryPath: RepositoryPath) =
         repositoryRepository.getByName(repositoryPath)
 
     fun getGradleWrapperVersionStatus(repositoryPath: RepositoryPath): GradleWrapperVersionStatus? =

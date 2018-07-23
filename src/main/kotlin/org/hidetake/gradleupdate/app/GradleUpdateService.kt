@@ -1,42 +1,31 @@
 package org.hidetake.gradleupdate.app
 
-import org.hidetake.gradleupdate.domain.*
+import org.eclipse.egit.github.core.Repository
+import org.hidetake.gradleupdate.domain.GradleWrapperPropertiesRepository
+import org.hidetake.gradleupdate.domain.GradleWrapperVersion
+import org.hidetake.gradleupdate.domain.RepositoryPath
+import org.hidetake.gradleupdate.domain.RepositoryRepository
 import org.springframework.stereotype.Service
 
 @Service
 class GradleUpdateService(
     private val repositoryRepository: RepositoryRepository,
-    private val gradleWrapperRepository: GradleWrapperRepository,
-    private val pullRequestRepository: PullRequestRepository
+    private val gradleWrapperPropertiesRepository: GradleWrapperPropertiesRepository
 ) {
     private val LATEST_GRADLE_WRAPPER = RepositoryPath("int128", "latest-gradle-wrapper")
 
-    fun getRepositoryMetadata(repositoryPath: RepositoryPath) =
-        repositoryRepository.getByName(repositoryPath)
+    fun getRepositoryMetadata(repositoryPath: RepositoryPath): Repository =
+        repositoryRepository.get(repositoryPath)
 
-    fun getGradleWrapperVersionStatus(repositoryPath: RepositoryPath): GradleWrapperVersionStatus? =
-        gradleWrapperRepository.findVersion(repositoryPath)?.let { target ->
-            gradleWrapperRepository.findVersion(LATEST_GRADLE_WRAPPER)?.let { latest ->
-                GradleWrapperVersionStatus(target, latest)
-            }
+    fun getGradleWrapperVersionStatus(repositoryPath: RepositoryPath): GradleWrapperVersionStatus {
+        val target = gradleWrapperPropertiesRepository.find(repositoryPath)?.version
+        when (target) {
+            null ->
         }
+        val latest = getLatestGradleWrapperVersion()
+    }
 
-    fun findPullRequestForUpdate(repositoryPath: RepositoryPath): PullRequestForUpdate? =
-        gradleWrapperRepository.findVersion(LATEST_GRADLE_WRAPPER)?.let { latest ->
-            pullRequestRepository.find(repositoryPath, latest)
-        }
-
-    fun createPullRequestForLatestGradleWrapper(repositoryPath: RepositoryPath) =
-        gradleWrapperRepository.findVersion(repositoryPath)?.let { target ->
-            gradleWrapperRepository.findVersion(LATEST_GRADLE_WRAPPER)?.let { latest ->
-                val status = GradleWrapperVersionStatus(target, latest)
-                when {
-                    status.upToDate -> TODO()
-                    else -> {
-                        val files = gradleWrapperRepository.findFiles(LATEST_GRADLE_WRAPPER)
-                        pullRequestRepository.createOrUpdate(repositoryPath, latest, files)
-                    }
-                }
-            }
-        }
+    fun getLatestGradleWrapperVersion(): GradleWrapperVersion =
+        gradleWrapperPropertiesRepository.find(LATEST_GRADLE_WRAPPER)?.version
+            ?: throw IllegalStateException("Not found latest Gradle Wrapper in $LATEST_GRADLE_WRAPPER")
 }

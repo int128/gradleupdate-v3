@@ -1,19 +1,15 @@
 package org.hidetake.gradleupdate.app
 
-import org.hidetake.gradleupdate.domain.GradleWrapperVersionStatus
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 
 object BadgeSvg {
-    fun render(status: GradleWrapperVersionStatus?) =
-        when (status?.upToDate) {
-            true  -> render(rightMessage = status.target.version, rightFill = "#4c1")
-            false -> render(rightMessage = status.target.version, rightFill = "#e05d44")
-            else  -> render(rightMessage = "unknown", rightFill = "#9f9f9f")
+    fun render(status: GradleWrapperVersionStatus) =
+        when (status.upToDate) {
+            true  -> render(rightMessage = status.targetGradleWrapperVersion.version, rightFill = "#4c1")
+            false -> render(rightMessage = status.targetGradleWrapperVersion.version, rightFill = "#e05d44")
         }
-
-    fun notFound() = render(rightMessage = "unknown", rightFill = "#9f9f9f")
 
     fun render(
         leftMessage: String = "Gradle",

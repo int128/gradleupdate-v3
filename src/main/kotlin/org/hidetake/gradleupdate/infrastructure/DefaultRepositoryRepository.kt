@@ -9,6 +9,6 @@ import org.hidetake.gradleupdate.domain.RepositoryRepository
 class DefaultRepositoryRepository(client: SystemGitHubClient) : RepositoryRepository {
     private val repositoryService = RepositoryService(client)
 
-    override fun getByName(repositoryPath: RepositoryPath): Repository =
+    override fun get(repositoryPath: RepositoryPath): Repository =
         repositoryService.getRepository({repositoryPath.fullName})
 }
